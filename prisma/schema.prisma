@@ -3,11 +3,83 @@
 
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
+// Generate Prisma Client for JavaScript applications.
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
+// Define PostgreSQL as our database provider.
 datasource db {
   provider = "postgresql"
+}
+
+// Defines the role a user can have inside a project.
+enum ProjectRole {
+  OWNER
+  MEMBER
+}
+
+// Defines the possible statuses of a task.
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+}
+
+// Defines the priority levels of a task.
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+// Stores registered users.
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // One user can own multiple projects.
+  projects     Project[]
+  // Projects this user participates in.
+  memberships ProjectMember[]
+}
+
+model Project {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  ownerId     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Each project belongs to one owner.
+  owner       User     @relation(fields: [ownerId], references: [id], onDelete: Restrict)
+
+  // Users participating in this project.
+  members ProjectMember[]
+}
+
+// Connects users with projects and stores their roles.
+model ProjectMember {
+  // User who is participating in the project.
+  userId String
+
+  // Project the user is participating in.
+  projectId String
+
+  // Role of the user within this project.
+  role ProjectRole @default(MEMBER)
+
+  // Relationship with the User model.
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Relationship with the Project model.
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  // Prevents the same user from joining the same project more than once.
+  @@id([userId, projectId])
 }
