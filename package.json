@@ -2,11 +2,12 @@
   "name": "taskforge-api",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon app.js",
-    "build": "prisma generate"
+    "dev": "nodemon src/server.js",
+    "build": "prisma generate",
+    "start": "node src/server.js"
   },
   "keywords": [],
   "author": "",
