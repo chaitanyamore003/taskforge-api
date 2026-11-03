@@ -1,4 +1,5 @@
 const express = require("express");
+const authenticateUser = require("../middlewares/auth.middleware");
 
 const router = express.Router();
 
@@ -8,6 +9,8 @@ router.get("/", (req, res) => {
         message: "TaskForge API is running successfully"
     });
 });
+
+
 
 
 
