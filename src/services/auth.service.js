@@ -1,12 +1,13 @@
 const prisma = require("../config/prisma");
 
-console.log("Auth service Prisma user delegate:", typeof prisma.user);
-
 // Import custom application error class.
 const AppError = require("../utils/AppError");
 
 // Import bcrypt for securely hashing passwords.
 const bcrypt = require("bcrypt");
+
+// import json web token for token service
+const jwt = require("jsonwebtoken");
 
 // Registration service.
 const registerUser = async (userData) => {
@@ -45,7 +46,53 @@ const registerUser = async (userData) => {
     };
 };
 
+// login service
+const loginUser = async (userData) => {
+    const email = userData.email.trim().toLowerCase();
+    const password = userData.password;
+
+
+    //checking user
+    const user = await prisma.user.findUnique({
+        where: {
+            email,
+        }
+    })
+
+    //if user not found return error
+    if (!user) {
+        throw new AppError("Invalid email or password", 401);
+    }
+
+    //camparing the passwords
+    const passwordMatch = await bcrypt.compare(password, user.passwordHash);
+
+    //if passwords don't match return error
+    if (!passwordMatch) {
+        throw new AppError("Invalid email or password", 401);
+    }
+
+    //generating jwt token
+    // Generate a JWT for the authenticated user.
+    const token = jwt.sign(
+        { id: user.id },
+        process.env.JWT_SECRET_KEY,
+        { expiresIn: process.env.JWT_EXPIRES_IN }
+    );
+
+    // Return the token and safe user information.
+    return {
+        token,
+        user: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+        },
+    };
+}
+
 // Export the registration service.
 module.exports = {
     registerUser,
+    loginUser,
 };

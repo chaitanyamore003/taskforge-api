@@ -14,7 +14,21 @@ const register = async (req, res) => {
     });
 };
 
+// Controller to handle user login.
+const login = async (req, res) => {
+    // Pass login details to the service.
+    const result = await authService.loginUser(req.body);
+
+    // Send the JWT and user details to the client.
+    res.status(200).json({
+        success: true,
+        message: "Login successful",
+        data: result,
+    });
+};
+
 // Export controller functions.
 module.exports = {
     register,
+    login
 };
