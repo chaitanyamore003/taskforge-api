@@ -1,6 +1,5 @@
 
 // Import the shared Prisma Client instance.
-const { use } = require("react");
 const prisma = require("../config/prisma");
 
 // Import our custom error class for handling application errors.

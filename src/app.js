@@ -10,6 +10,8 @@ const errorHandler = require("./middlewares/error.middleware");
 const healthRoutes = require("./routes/health.routes");
 const authRoutes = require("./routes/auth.routes");
 const projectRoutes = require("./routes/project.routes");
+const taskRoutes = require("./routes/task.routes");
+
 
 // Create an Express application.
 const app = express();
@@ -32,6 +34,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // API routes will be registered here.
+app.use("/api", taskRoutes);
 app.use("/api/health", healthRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/projects", projectRoutes);

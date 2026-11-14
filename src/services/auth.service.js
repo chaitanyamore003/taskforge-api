@@ -29,6 +29,7 @@ const registerUser = async (userData) => {
 
     // Hash the user's password using 12 salt rounds.
     const hashedPassword = await bcrypt.hash(userData.password, 12);
+
     // Create a new user record in the database.
     const newUser = await prisma.user.create({
         data: {
