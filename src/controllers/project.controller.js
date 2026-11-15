@@ -109,11 +109,35 @@ const deleteProject = async (req, res) => {
     });
 };
 
+// Controller to get project task summary.
+const getProjectSummary = async (req, res) => {
+
+    // Extract project ID from URL parameters.
+    const projectId = req.params.projectId;
+
+    // Get authenticated user's ID from JWT middleware.
+    const userId = req.user.id;
+
+    // Call the service to calculate project statistics.
+    const summary = await projectService.getProjectSummary({
+        projectId,
+        userId
+    });
+
+    // Return the project summary.
+    return res.status(200).json({
+        success: true,
+        message: "Project summary fetched successfully",
+        data: summary
+    });
+};
+
 // Export the controllers so they can be used in project routes.
 module.exports = {
     createProject,
     getProjects,
     getProjectById,
     addProjectMember,
-    deleteProject
+    deleteProject,
+    getProjectSummary
 };

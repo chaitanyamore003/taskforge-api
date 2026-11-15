@@ -319,8 +319,52 @@ const updateTask = async ({
     return updatedTask;
 };
 
+// Service to delete a task.
+const deleteTask = async ({ userId, taskId }) => {
+
+    // Find the task using its unique ID.
+    const existingTask = await prisma.task.findUnique({
+        where: {
+            id: taskId
+        }
+    });
+
+    if (!existingTask) {
+        throw new AppError("Task not found", 404);
+    }
+
+    // Check whether the requesting user created the task.
+    const isCreator = existingTask.creatorId === userId;
+
+    // Check whether the requesting user owns the project.
+    const isProjectOwner = await prisma.project.findFirst({
+        where: {
+            id: existingTask.projectId,
+            ownerId: userId
+        }
+    });
+
+    // Only the creator or project owner can delete the task.
+    if (!isCreator && !isProjectOwner) {
+        throw new AppError(
+            "You are not authorized to delete this task",
+            403
+        );
+    }
+
+    // Delete the task from the database.
+    const taskDeleted = await prisma.task.delete({
+        where: {
+            id: taskId
+        }
+    });
+
+    return taskDeleted;
+};
+
 module.exports = {
     createTask,
     getTasks,
-    updateTask
+    updateTask,
+    deleteTask
 };

@@ -43,6 +43,10 @@ router.patch(
 );
 
 
+// Route to delete a task
+router.delete("/tasks/:taskId", authenticateUser, taskController.deleteTask);
+
+
 
 
 module.exports = router;

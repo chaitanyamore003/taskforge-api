@@ -65,5 +65,12 @@ router.delete(
     projectController.deleteProject
 );
 
+// Route to get project task summary.
+router.get(
+    "/:projectId/summary",
+    authenticateUser,
+    projectController.getProjectSummary
+);
+
 // Export the router so it can be mounted in app.js.
 module.exports = router;

@@ -110,9 +110,35 @@ const updateTask = async (req, res) => {
     });
 };
 
+// Controller to delete a task.
+const deleteTask = async (req, res) => {
+
+    // Get authenticated user's ID from JWT middleware.
+    const userId = req.user.id;
+
+    // Get task ID from URL parameters.
+    const taskId = req.params.taskId;
+
+    // Call service to perform deletion.
+    const deleted = await taskService.deleteTask({
+        userId,
+        taskId
+    });
+
+    return res.status(200).json({
+        success: true,
+        message: "Task deleted successfully",
+        data: {
+            id: deleted.id,
+            title: deleted.title
+        }
+    });
+};
+
 // Export task controller.
 module.exports = {
     createTask,
     getTasks,
-    updateTask
+    updateTask,
+    deleteTask
 };

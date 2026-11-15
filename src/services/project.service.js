@@ -212,6 +212,83 @@ const deleteProject = async (projectId, userId) => {
     };
 }
 
+// Service to get project task summary.
+const getProjectSummary = async ({ projectId, userId }) => {
+
+    // 1. Verify that the user belongs to the project.
+    const membership = await prisma.projectMember.findUnique({
+        where: {
+            userId_projectId: {
+                userId,
+                projectId
+            }
+        }
+    });
+
+    if (!membership) {
+        throw new AppError("Project not found", 404);
+    }
+
+    // 2. Count tasks grouped by status.
+    const statusCounts = await prisma.task.groupBy({
+        by: ["status"],
+        where: {
+            projectId
+        },
+        _count: {
+            _all: true
+        }
+    });
+
+    // 3. Count tasks grouped by priority.
+    const priorityCounts = await prisma.task.groupBy({
+        by: ["priority"],
+        where: {
+            projectId
+        },
+        _count: {
+            _all: true
+        }
+    });
+
+    // 4. Calculate total number of tasks.
+    const totalTasks = await prisma.task.count({
+        where: {
+            projectId
+        }
+    });
+
+    // 5. Initialize all possible statuses with zero.
+    const formattedStatusCounts = {
+        TODO: 0,
+        IN_PROGRESS: 0,
+        DONE: 0
+    };
+
+    // Populate actual status counts.
+    statusCounts.forEach((item) => {
+        formattedStatusCounts[item.status] = item._count._all;
+    });
+
+    // 6. Initialize all possible priorities with zero.
+    const formattedPriorityCounts = {
+        LOW: 0,
+        MEDIUM: 0,
+        HIGH: 0
+    };
+
+    // Populate actual priority counts.
+    priorityCounts.forEach((item) => {
+        formattedPriorityCounts[item.priority] = item._count._all;
+    });
+
+    // 7. Return the formatted project summary.
+    return {
+        totalTasks,
+        statusCounts: formattedStatusCounts,
+        priorityCounts: formattedPriorityCounts
+    };
+};
 
 
 // Export the service function for use in the controller.
@@ -220,5 +297,6 @@ module.exports = {
     getProjects,
     getProjectById,
     addProjectMember,
-    deleteProject
+    deleteProject,
+    getProjectSummary
 };
