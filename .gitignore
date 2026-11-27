@@ -6,3 +6,9 @@ node_modules
 
 /node_modules
 coverage/
+.agent/
+
+/coverage
+/.turbo
+/node_modules
+/out

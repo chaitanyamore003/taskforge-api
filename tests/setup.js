@@ -2,7 +2,10 @@ const path = require("path");
 const dotenv = require("dotenv");
 
 // 1. Load environment variables FIRST
-dotenv.config({ path: path.resolve(__dirname, "../.env") });
+dotenv.config({
+    path: path.resolve(__dirname, "../.env"),
+    quiet: true
+});
 
 // 2. Import Prisma
 const prisma = require("../src/config/prisma");
